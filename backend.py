@@ -1,22 +1,18 @@
 from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 
-# Tavily
+# Tavily (buscador web)
 from langchain_community.tools.tavily_search import TavilySearchResults
 search = TavilySearchResults()
 
-# Recuperador (Retriever)
+# Recuperador (Retriever que utiliza información de un video de Youtube)
 from langchain_community.document_loaders import YoutubeLoader # cargador de transcripciones de Youtube
 from langchain.text_splitter import RecursiveCharacterTextSplitter # divisor de textos
 from langchain_openai import OpenAIEmbeddings # embeddings de OpenAI
 from langchain_community.vectorstores import FAISS # almacenamiento de vectores
 
-# loader = YoutubeLoader.from_youtube_url(
-#     "https://youtu.be/hvAPnpSfSGo?si=WGO9qvzuBjRYKGaE", add_video_info=False # LangGraph: Multi-Agent Workflows
-# )
-
 loader = YoutubeLoader.from_youtube_url(
-    "https://www.youtube.com/watch?v=T2M9hSswlIs", add_video_info=False # LangGraph: Multi-Agent Workflows
+    "https://youtu.be/hvAPnpSfSGo?si=WGO9qvzuBjRYKGaE", add_video_info=False # LangGraph: Multi-Agent Workflows
 )
 
 
@@ -28,19 +24,11 @@ vector = FAISS.from_documents(documents, OpenAIEmbeddings())
 retriever = vector.as_retriever()
 
 from langchain.tools.retriever import create_retriever_tool
-# retriever_tool = create_retriever_tool(
-#     retriever,
-#     "langgraph_search",
-#     "Search for information about LangGraph. For any questions about LangGraph, you must use this tool!",
-# )
-
-
 retriever_tool = create_retriever_tool(
     retriever,
-    "youtube_advicer",
-    "Información sobre consejos de YouTube. Para cualquier pregunta sobre consejos sobre como iniciar un canal de YouTube en el 2024, debe usar esta herramienta!",
+    "langgraph_search",
+    "Search for information about LangGraph. For any questions about LangGraph, you must use this tool! Always respond in Spanish.",
 )
-
 
 tools = [search, retriever_tool]
 
